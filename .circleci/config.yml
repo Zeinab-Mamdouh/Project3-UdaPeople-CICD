@@ -3,98 +3,127 @@ orb:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys:
+            - frontend-deps-{{ checksum "frontend/package-lock.json" }}
       - run:
-          name: Build front-end
+          name: Install dependencies
           command: |
             cd frontend
             npm install
+      - run:
+          name: Build frontend
+          command: |
+            cd frontend
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-build
+          key: frontend-deps-{{ checksum "frontend/package-lock.json" }}
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+    - image: cimg/node:13.8.0
     steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Build Back-end
-          command: |
-            cd backend
-            npm install
-            npm run build
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-build
+    - checkout
+    - restore_cache:
+       keys:
+         - backend-deps-{{ checksum "backend/package-lock.json" }}
+    - run:
+        name: Install dependencies
+        command: |
+          cd backend
+          npm install
+    - run:
+        name: Build backend
+        command: |
+          cd backend
+          npm run build
+    - save_cache:
+        paths: [backend/node_modules]
+        key: backend-deps-{{ checksum "backend/package-lock.json" }}
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+    - image: cimg/node:13.8.0
     steps:
-      - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: Test Frontend
-          command: |
-            cd frontend
-            npm install
-            npm run test
+    - checkout
+    - restore_cache:
+       keys:
+         - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+    - run:
+        name: Install dependencies
+        command: |
+          cd frontend
+          npm install
+    - run:
+        name: Run frontend unit tests
+        command: |
+          cd frontend
+          npm run test
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+    - image: cimg/node:13.8.0
     steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Test Backend 
-          command: |
-            cd backend
-            npm install
-            npm run test
+    - checkout
+    - restore_cache:
+       keys:
+         - backend-deps-{{ checksum "backend/package-lock.json" }}
+    - run:
+        name: Install dependencies
+        command: |
+          cd backend
+          npm install
+    - run:
+        name: Run backend unit tests
+        command: |
+          cd backend
+          npm run test
 
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0
+    - image: cimg/node:13.8.0
     steps:
-      - checkout
-      - restore_cache:
-          keys: [frontend-build]
-      - run:
-          name: scan front-end
-          command: |
-            cd frontend
-            npm install
-            #npm install oauth-sign@^0.9.0
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
-
+    - checkout
+    - restore_cache:
+       keys:
+         - frontend-deps-{{ checksum "frontend/package-lock.json" }}
+    - run:
+        name: Install dependencies
+        command: |
+          cd frontend
+          npm install
+    - run:
+        name: Scan frontend packages
+        command: |
+          cd frontend
+          npm audit fix --force --audit-level=critical
+          npm audit --audit-level=critical
+          
   scan-backend:
     docker:
-      - image: circleci/node:13.8.0
+    - image: cimg/node:13.8.0
     steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Scan Back-end 
-          command: |
-            cd backend
-            npm install
-            #npm install oauth-sign@^0.9.0
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
+    - checkout
+    - restore_cache:
+       keys:
+         - backend-deps-{{ checksum "backend/package-lock.json" }}
+    - run:
+        name: Install dependencies
+        command: |
+          cd backend
+          npm install
+    - run:
+        name: Scan backend packages
+        command: |
+          cd backend
+          npm install
+          npm audit fix --force --audit-level=critical
+          npm audit fix --force --audit-level=critical
+          npm audit --audit-level=critical
 
 workflows:
   default:
