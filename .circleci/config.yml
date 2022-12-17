@@ -100,8 +100,9 @@ jobs:
         name: Scan frontend packages
         command: |
           cd frontend
-          npm audit --audit-level=critical
-          npm audit fix --force --audit-level=critical
+          npm install oauth-sign@^0.9.0
+          npm audit fix --audit-level=critical
+          #npm audit --audit-level=critical
           
   scan-backend:
     docker:
@@ -121,9 +122,10 @@ jobs:
         command: |
           cd backend
           npm install
-          npm audit --audit-level=critical
+          #npm install oauth-sign@^0.9.0
           npm audit fix --force --audit-level=critical
           npm audit fix --force --audit-level=critical
+          #npm audit --audit-level=critical
           
 
 workflows:
