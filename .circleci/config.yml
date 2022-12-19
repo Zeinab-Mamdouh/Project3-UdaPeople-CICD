@@ -1,5 +1,16 @@
 version: 2.1
-orb: 
+orb:
+  slack: circleci/slack@4.10.1
+commands:
+
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            python3 -m pip install --user ansible  
+
 jobs:
   build-frontend:
     docker:
@@ -127,6 +138,44 @@ jobs:
           npm audit fix --force --audit-level=critical
           #npm audit --audit-level=critical
           
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Ensure Backend Infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udapeople \
+              --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              
+      - run:
+          name: Add Backend Ip to Ansible inventory
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 
 workflows:
   default:
