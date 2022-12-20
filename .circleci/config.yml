@@ -1,6 +1,7 @@
 version: 2.1
 orb:
   slack: circleci/slack@4.10.1
+
 commands:
   install_awscli:
     description: Install AWS CLI V2
@@ -176,9 +177,10 @@ jobs:
           
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/python:3.10
     steps:
       - checkout
+      - install_awscli
       - run:
           name: Install tar utility
           command: |
@@ -202,6 +204,7 @@ jobs:
       - run:
           name: Add Backend Ip to Ansible inventory
           command: |
+            cd .circleci/ansible
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
