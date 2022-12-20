@@ -2,18 +2,23 @@ version: 2.1
 orb:
   slack: circleci/slack@4.10.1
 commands:
-
+  install_awscli:
+    description: Install AWS CLI V2
+    steps:
+      - run:
+          name: Install AWS CLI V2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+  
   install_ansible:
     description: Install Ansible
     steps:
       - run:
           name: Install Ansible
           command: |
-            sudo apt --update
-            sudo apt install software-properties-common -y
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
-
+            python3 -m pip install --user ansible
   install_nodejs:
     description: Install Node.js 13.8.0
     steps:
@@ -213,6 +218,7 @@ jobs:
     - image: cimg/python:3.10
     steps:
     - checkout
+    - install_awscli
     - install_ansible
     - add_ssh_keys:
        fingerprints: ["1c:bd:fa:b8:99:11:10:18:55:d9:c2:52:1b:9b:18:ff"]
@@ -225,6 +231,7 @@ jobs:
          cat inventory.txt
          ansible-playbook -i inventory.txt configure-server.yml
     - destroy-environment
+
 workflows:
   default:
      jobs:
