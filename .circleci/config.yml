@@ -206,7 +206,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update ansible
-            cat inventory.txt
+            
       - run:
           name: Configure Server
           command: |
