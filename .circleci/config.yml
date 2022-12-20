@@ -220,20 +220,20 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - run: apk add --update tar gzip
-      - attach_workspace:
-          at: ~/
       - add_ssh_keys:
-          fingerprints: ["1c:bd:fa:b8:99:11:10:18:55:d9:c2:52:1b:9b:18:ff"]
+          fingerprints:
+            - "1c:bd:fa:b8:99:11:10:18:55:d9:c2:52:1b:9b:18:ff"
+      - attach_workspace:
+          at: ~/ 
+      - install_awscli
+      - install_ansible
       - run:
-          name: Install dependencies
+          name: Configure server
           command: |
-            apk add --update ansible
-      - run:
-          name: Configure Server
-          command: |
-            ansible-playbook .circleci/ansible/configure-server.yml -i .circleci/ansible/inventory.txt
-      - destroy-environment
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml 
+      - destroy-environment   
 
 workflows:
   default:
