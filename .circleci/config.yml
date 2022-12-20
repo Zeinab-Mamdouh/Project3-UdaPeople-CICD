@@ -217,24 +217,23 @@ jobs:
       
   configure-infrastructure:
     docker:
-      - image: cimg/python:3.10
+    - image: cimg/python:3.10
     steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - "1c:bd:fa:b8:99:11:10:18:55:d9:c2:52:1b:9b:18:ff"
-      - attach_workspace:
-          at: ~/ 
-      - install_awscli
-      - install_ansible
-      - run:
-          name: Configure server
-          command: |
-            cd .circleci/ansible
-            cat inventory.txt
-            ansible-playbook -i inventory.txt configure-server.yml 
-      - destroy-environment   
+    - checkout
+    - install_ansible
+    - install_awscli
+    - add_ssh_keys:
+       fingerprints: ["1c:bd:fa:b8:99:11:10:18:55:d9:c2:52:1b:9b:18:ff"]
+    - attach_workspace:
+        at: ~/
+    - run:
+       name: Run Configure Server Ansible play
+       command: |
+         cd .circleci/ansible
+         cat inventory.txt
 
+         ansible-playbook -i inventory.txt configure-server.yml
+    - destroy-environment
 workflows:
   default:
      jobs:
