@@ -177,10 +177,9 @@ jobs:
           
   deploy-infrastructure:
     docker:
-      - image: cimg/python:3.10
+      - image: amazon/aws-cli
     steps:
       - checkout
-      - install_awscli
       - run:
           name: Install tar utility
           command: |
@@ -204,7 +203,6 @@ jobs:
       - run:
           name: Add Backend Ip to Ansible inventory
           command: |
-            cd .circleci/ansible
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
@@ -216,6 +214,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
+      
   configure-infrastructure:
     docker:
     - image: cimg/python:3.10
