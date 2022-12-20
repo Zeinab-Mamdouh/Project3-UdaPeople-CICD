@@ -5,11 +5,12 @@
     remote_src: yes
 
 - name: "move binary to /usr/local/bin."
+  become: true
   copy:
     src: /tmp/node_exporter-1.4.0.linux-amd64/node_exporter
     dest: /usr/local/bin/node_exporter
     remote_src: yes
-    mode: "0777"
+    mode: '0777'
     
 - name: "add node exporter configuration."
   become: true
@@ -24,3 +25,4 @@
     daemon_reload: yes
     name: node_exporter
     enabled: yes
+  
