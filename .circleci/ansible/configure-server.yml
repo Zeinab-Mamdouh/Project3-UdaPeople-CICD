@@ -7,19 +7,19 @@
   become_user: root  
   gather_facts: false
   vars:
-    ansible_python_interpreter: /usr/bin/python3
-    ansible_host_key_checking: false
-    ansible_stdout_callback: yaml
+    - ansible_python_interpreter: /usr/bin/python3
+    - ansible_host_key_checking: false
+    - ansible_stdout_callback: yaml
 
   pre_tasks:
     - name: "wait 600 seconds for target connection to become reachable/usable."
       wait_for_connection:
         timeout: 600   
+
     - name: "install python for Ansible."
       become: true
-      apt:
-        name: python3
-        update_cache: yes
+      raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
+      Changed_when: false
 
   roles:
     - configure-server
