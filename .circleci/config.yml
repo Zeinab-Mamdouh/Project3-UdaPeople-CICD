@@ -216,23 +216,23 @@ jobs:
       
   configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+    - image: cimg/python:3.10
     steps:
-      - checkout
-      - run: apk add --update tar gzip
-      - attach_workspace:
-          at: ~/
-      - add_ssh_keys:
-          fingerprints: ["c4:ed:fe:48:4f:33:47:43:67:3e:df:99:72:50:8a:fb"]
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
-      - run:
-          name: Configure Server
-          command: |
-            ansible-playbook .circleci/ansible/configure-server.yml -i .circleci/ansible/inventory.txt
-      - destroy-environment
+    - checkout
+    - install_ansible
+    - install_awscli
+    - add_ssh_keys:
+       fingerprints: ["c4:ed:fe:48:4f:33:47:43:67:3e:df:99:72:50:8a:fb"]
+    - attach_workspace:
+        at: ~/
+    - run:
+       name: Run Configure Server Ansible play
+       command: |
+         cd .circleci/ansible
+         cat inventory.txt
+
+         ansible-playbook -i inventory.txt configure-server.yml
+    - destroy-environment
 
 workflows:
   default:
