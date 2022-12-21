@@ -28,7 +28,6 @@ commands:
           command: |
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
             sudo apt install -y nodejs
-            sudo apt install -y npm
             # Use n version manager to use Node.js v13.8.0
             sudo npm install --global n
             sudo n 13.8.0
@@ -47,6 +46,27 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+
+  revert-migrations:
+    description: Revert the last migration, if any were executed during the current workflow
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure  https://kvdb.io/9uMoQkF2RLFVS1jtJnbAsL/migration_<< parameters.Workflow_ID >>)
+
+            # Logic for reverting the database state
+            if (( $SUCCESS == 1 ));
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi    
 
 jobs:
   build-frontend:
@@ -234,6 +254,41 @@ jobs:
          ansible-playbook -i inventory.txt configure-server.yml
     - destroy-environment
 
+  run-migrations:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-deps]
+      - run: 
+          name: Install aws cli
+          command: |
+            #test
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install     
+      - run:
+          name: Run migrations
+          command: |
+            cd backend 
+            npm install      
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
+      - run: 
+          name: Send Migration Results to kvdb.io
+          command: |
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              # If you are using kvdb.io, generate the bucket ID "Yb81p1jNcDxvSTuh15zcJX" in your local terminal first
+              curl -d '1' https://kvdb.io/9uMoQkF2RLFVS1jtJnbAsL/migration_${CIRCLE_WORKFLOW_ID:0:7}
+            else
+              echo "No migration are pending"  
+            fi
+      - destroy-environment
+      - revert-migrations
+
 workflows:
   default:
      jobs:
@@ -254,3 +309,5 @@ workflows:
               only: [master]
        - configure-infrastructure:
           requires: [deploy-infrastructure]
+       - run-migrations:
+          requires: [configure-infrastructure]
