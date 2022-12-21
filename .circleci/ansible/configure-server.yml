@@ -17,9 +17,9 @@
         timeout: 600   
 
     - name: "install python for Ansible."
-      become: true
-      raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
-      Changed_when: false
+      apt:
+        name: python3
+        update_cache: yes
 
   roles:
     - configure-server
