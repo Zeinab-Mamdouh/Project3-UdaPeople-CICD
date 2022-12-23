@@ -272,11 +272,8 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            sudo apt-get install npm
-            cd backend
-            npm cache clean --force
-            rm -rf node_modules
-            npm install      
+            cd backend  
+            sudo apt-get install npm    
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
       - run:
