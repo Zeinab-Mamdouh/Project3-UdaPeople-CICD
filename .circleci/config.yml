@@ -20,6 +20,7 @@ commands:
           name: Install Ansible
           command: |
             python3 -m pip install --user ansible
+
   install_nodejs:
     description: Install Node.js 13.8.0
     steps:
@@ -272,7 +273,7 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            install_nodejs
+            sudo apt install -y nodejs
             cd backend 
             npm install      
             npm run migrations > migrations_dump.txt
