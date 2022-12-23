@@ -273,8 +273,8 @@ jobs:
       - run:
           name: Run migrations
           command: |
-            sudo apt install -y nodejs
             cd backend 
+            rm -rf node_modules
             npm install      
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
