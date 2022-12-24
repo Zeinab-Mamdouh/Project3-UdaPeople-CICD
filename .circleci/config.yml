@@ -233,8 +233,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment   
-
-      
+  
   configure-infrastructure:
     docker:
     - image: cimg/python:3.10
