@@ -293,12 +293,13 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - install_awscli
       - run:
           name: Install dependencies
           command: |
-            cd frontend
-            npm install
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install  
       - run:
           name: Get backend url
           command: |
