@@ -1,1 +1,3 @@
-https://github.com/Zeinab-Mamdouh/Project3-UdaPeople-CICD   public GitHub repository. [URL01]
+public GitHub repository.  [URL01]   https://github.com/Zeinab-Mamdouh/Project3-UdaPeople-CICD   
+
+public URL for S3 Bucket . [URL02]  https://s3.console.aws.amazon.com/s3/buckets/udapeople-c6ed85d?region=us-east-1&tab=objects
