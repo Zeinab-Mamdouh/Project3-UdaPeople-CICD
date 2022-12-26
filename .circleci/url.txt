@@ -1,3 +1,9 @@
 public GitHub repository.  [URL01]   https://github.com/Zeinab-Mamdouh/Project3-UdaPeople-CICD   
 
-public URL for S3 Bucket . [URL02]  https://s3.console.aws.amazon.com/s3/buckets/udapeople-c6ed85d?region=us-east-1&tab=objects
+ S3 Bucket URL:  . [URL02]  https://s3.console.aws.amazon.com/s3/buckets/udapeople-2f640ff?region=us-east-1&tab=objects
+
+ Frontend URL: http://udapeople-2f640ff.s3-website-us-east-1.amazonaws.com
+
+EC2 URL: https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#Instances:instanceState=running
+
+CloudFront URL: http://d1t549or18lrld.cloudfront.net/#/employees
