@@ -1,0 +1,9 @@
+public GitHub repository.  [URL01]   https://github.com/Zeinab-Mamdouh/Project3-UdaPeople-CICD   
+
+S3 Bucket URL:             [URL02]   http://udapeople-d288174.s3-website-us-east-1.amazonaws.com
+
+CloudFront URL:            [URL03]   https://d1t549or18lrld.cloudfront.net
+
+Backend URL in EC2:        [URL04]   http://ec2-44-202-50-76.compute-1.amazonaws.com
+
+Prometheus Server:         [URL05]   http://ec2-52-87-177-237.compute-1.amazonaws.com
