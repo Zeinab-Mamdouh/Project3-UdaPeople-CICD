@@ -438,20 +438,19 @@ jobs:
             command: |        
               export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
               echo "Old Workflow ID: $OldWorkflowID" 
-            
-              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-              # Fetch the stack names          
+              
               export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
-              --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-              echo Stack names: "${STACKS[@]}"           
-              if [[ "${STACKS[@]}" =~ ${OLDWORKFLOWID} ]]
+                      --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+              echo Stack names: "${STACKS[@]}" 
+              
+              if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
               then
-                aws s3 rm "s3://udapeople-${OLDWORKFLOWID}" --recursive
-                aws cloudformation delete-stack --stack-name "udapeople-backend-${OLDWORKFLOWID}"
-                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OLDWORKFLOWID}"
-                echo cleaning confirmed
+                echo "----------Cleaning Up in progress----------"
+                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
               else
-                echo cant clean
+                echo "----------Cleaning Up Failed----------"
               fi
 
 workflows:
